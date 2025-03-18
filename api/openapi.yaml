@@ -1,0 +1,781 @@
+openapi: 3.0.0
+
+info:
+  title: ShadowTrap
+  description: |
+    API for interacting with the ShadowTrap service.
+
+    ShadowTrap is a service to automatically deploy honeypots across a network. It automatically puts pots on unused IPs either synced from external IPAM or detected automatically. It can forward threat information to external services to complete actions to ensure robust network security.
+
+    See [shadowtrap.dev](https://shadowtrap.dev) for more information <3
+  version: 1.0.0
+  license:
+    name: MIT
+
+servers:
+  - url: https://demo.shadowtrap.dev/api
+
+paths:
+  /meta/api:
+    get:
+      tags:
+        - meta
+      summary: Get information about the ShadowTrap API
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/api_info"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /meta/server:
+    get:
+      tags:
+        - meta
+      summary: Get information about the ShadowTrap server
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/server_info"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+  /info/pots:
+    get:
+      tags:
+        - info/pots
+      summary: Get information about deployed pots
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pots"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+  /info/pots/{id}:
+    get:
+      tags:
+        - info/pots
+      summary: Get information about a deployed pot
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: dev@eno1.native@linux-heavy-2024-03@1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pot"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+  /settings/pots/images:
+    get:
+      tags:
+        - settings/pots
+      summary: Get information about the available pot images
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pot_images"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+  /settings/pots/images/{id}:
+    get:
+      tags:
+        - settings/pots
+      summary: Get information about an available pot image
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: linux-heavy-2024-03
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pot_image"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+  /settings/pots/deployments:
+    get:
+      tags:
+        - settings/pots
+      summary: Get information about configured pot deployments
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pot_deployments"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+    post:
+      tags:
+        - settings/pots
+      summary: Create new pot deployment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/pot_deployment"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pot_deployment"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+  /settings/pots/deployments/{id}:
+    get:
+      tags:
+        - settings/pots
+      summary: Get information about a configured pot deployment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: dev
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pot_deployment"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+    put:
+      tags:
+        - settings/pots
+      summary: Set information about a configured pot deployment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: dev
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/pot_deployment"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pot_deployment"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+    delete:
+      tags:
+        - settings/pots
+      summary: Delete a pot deployment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: dev
+      responses:
+        200:
+          description: Success
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+  /settings/network/host:
+    get:
+      tags:
+        - settings/network
+      summary: Get information about the host's networking
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/network_host"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+    put:
+      tags:
+        - settings/network
+      summary: Set information about the host's networking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/network_host"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/network_host"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+  /settings/network/interfaces:
+    get:
+      tags:
+        - settings/network
+      summary: Get information about the network interfaces
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/network_interfaces"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+  /settings/network/interfaces/{id}:
+    get:
+      tags:
+        - settings/network
+      summary: Get information about a network interface
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: eno1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/network_interfaces"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+    put:
+      tags:
+        - settings/network
+      summary: Set information about a network interface
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: eno1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/network_interface"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/network_interfaces"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+  /settings/network/networks:
+    get:
+      tags:
+        - settings/network
+      summary: Get information about configured networks
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/network_networks"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+    post:
+      tags:
+        - settings/network
+      summary: Create a new network
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/network_network"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/network_network"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+  /settings/network/networks/{id}:
+    get:
+      tags:
+        - settings/network
+      summary: Get information about a configured network
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: eno1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/network_network"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+    put:
+      tags:
+        - settings/network
+      summary: Set information about a configured network
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: eno1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/network_network"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/network_network"
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+    delete:
+      tags:
+        - settings/network
+      summary: Delete a network
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: eno1
+      responses:
+        200:
+          description: Success
+        500:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error"
+      security:
+        - api_key: []
+
+tags:
+  - name: meta
+    description: Information about ShadowTrap
+  - name: info/pots
+    description: Information about deployed pots
+  - name: settings/pots
+    description: Honeypot settings
+  - name: settings/network
+    description: Networking settings
+
+components:
+  schemas:
+    error:
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          example: ERR_INVALID_PARAMETER
+        info:
+          type: string
+          example: Client sent an invalid parameter
+    api_info:
+      required:
+        - name
+        - version
+      properties:
+        name:
+          type: string
+          example: shadowtrap
+        version:
+          type: string
+          example:
+            $ref: "#/info/version"
+    server_info:
+      required:
+        - name
+        - version
+      properties:
+        name:
+          type: string
+          example: shadowtrap
+        version:
+          type: string
+          example:
+            $ref: "#/info/version"
+    pots:
+      required:
+        - pots
+      properties:
+        interfaces:
+          type: array
+          items: 
+            $ref: "#/components/schemas/pot"
+    pot:
+      required:
+        - id
+        - deployment
+        - image
+        - network
+        - discriminator
+        - status
+      properties:
+        id:
+          type: string
+          example: dev@eno1.native@linux-heavy-2024-03@1
+        deployment:
+          type: string
+          example: dev
+        image:
+          type: string
+          example: linux-heavy-2024-03
+        network:
+          type: string
+          example: eno1.native
+        discriminator:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum: [healthy, degraded]
+          example: healthy
+    pot_images:
+      required:
+        - images
+      properties:
+        interfaces:
+          type: array
+          items: 
+            $ref: "#/components/schemas/pot_image"
+    pot_image:
+      required:
+        - id
+        - base
+        - version
+        - os
+      properties:
+        id:
+          type: string
+          example: linux-heavy-2024-03
+        base:
+          type: string
+          example: linux-heavy
+        version:
+          type: string
+          example: 2024-03
+        os:
+          type: string
+          example: linux
+        features:
+          type: array
+          items:
+            required:
+              - name
+              - version
+            properties:
+              name:
+                type: string
+                example: openssh
+              version:
+                type: string
+                example: 9.9
+    pot_deployments:
+      required:
+        - deployments
+      properties:
+        interfaces:
+          type: array
+          items: 
+            $ref: "#/components/schemas/pot_deployment"
+    pot_deployment:
+      required:
+        - id
+        - active
+        - count
+        - image
+        - network
+        - ipam
+      properties:
+        id:
+          type: string
+          example: dev
+        active:
+          type: boolean
+          example: true
+        count:
+          type: integer
+          example: 5
+        image:
+          type: array
+          items:
+            required:
+              - id
+            properties:
+              id:
+                type: string
+                example: linux-heavy-2024-03
+        network:
+          type: array
+          items:
+            required:
+              - id
+            properties:
+              id:
+                type: string
+                example: eno1.native
+    network_host:
+      required:
+        - network
+        - mode
+      properties:
+        network:
+          type: string
+          example: eno1.native
+        mode:
+          type: string
+          enum: [static, dhcp]
+          example: static
+        static_ip:
+          type: string
+          example: 10.0.0.100
+        static_gateway:
+          type: string
+          example: 10.0.0.1
+        static_dns:
+          type: string
+          example: 1.1.1.1
+    network_interfaces:
+      required:
+        - interfaces
+      properties:
+        interfaces:
+          type: array
+          items: 
+            $ref: "#/components/schemas/network_interface"
+    network_interface:
+      required:
+        - id
+        - enabled
+        - link
+      properties:
+        id:
+          type: string
+          example: eno1
+        enabled:
+          type: boolean
+          example: true
+        link:
+          type: boolean
+          example: true
+        mode:
+          type: string
+          enum: [standalone, aggregated]
+          example: standalone
+        aggregate_group:
+          type: string
+          example: group1
+    network_networks:
+      required:
+        - networks
+      properties:
+        networks:
+          type: array
+          items: 
+            $ref: "#/components/schemas/network_network"
+    network_network:
+      required:
+        - id
+        - enabled
+        - interface
+      properties:
+        id:
+          type: string
+          example: eno1.native
+        enabled:
+          type: boolean
+          example: true
+        interface:
+          type: string
+          example: eno1
+        type:
+          type: string
+          enum: [native, vlan]
+          example: native
+        vlan_id:
+          type: integer
+          example: 110
+        subnet:
+          type: string
+          example: 10.0.0.0/24
+
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
