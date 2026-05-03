@@ -605,6 +605,17 @@ components:
           type: string
           enum: [healthy, degraded]
           example: healthy
+        ip:
+          type: string
+          example: 10.0.0.42
+        expires_at:
+          type: string
+          description: RFC3339 UTC timestamp at which the pot will be destroyed and redeployed. Absent if the deployment's ttl_minutes is zero.
+          example: 2026-04-20T15:00:00Z
+        cred_hint:
+          type: string
+          description: Human-readable label for the per-pot admin credential set ("root@linux-heavy-dev-01"). The secret itself is never exposed by the API.
+          example: admin@linux-heavy-dev-01
     pot_images:
       required:
         - images
@@ -689,6 +700,18 @@ components:
               id:
                 type: string
                 example: eno1.native
+        ipam:
+          type: string
+          enum: [sweep, phpipam, netbox]
+          example: sweep
+        ttl_minutes:
+          type: integer
+          description: >-
+            Hard lifetime for every pot in this deployment. After this many
+            minutes the pot is destroyed, its disk image discarded, and a
+            fresh pot is provisioned in its place. Set to 0 to disable the
+            time-boxed lifecycle. Default 0.
+          example: 240
     network_host:
       required:
         - network
